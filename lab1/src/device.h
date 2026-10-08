@@ -1,3 +1,5 @@
+#include <pcap/pcap.h>
+
 /**
  * @file device.h
  * @brief Library supporting network device management
@@ -19,3 +21,8 @@
   * -1 if no such device was found.
   */
 int findDevice(const char* device);
+
+/**
+ * Get the pcap_t object associated with a device ID
+ */
+pcap_t *getDeviceHandle(int device_id);

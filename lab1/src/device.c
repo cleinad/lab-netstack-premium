@@ -69,3 +69,18 @@ int findDevice(const char* device) {
 /*
 note that right now each device is associated with only one session (pcap), could totally be more
 */
+
+/**
+ * Find a pcap_t handle for a particular device_id
+ *
+ * @param device_id ID of the device.
+ * @return A pcap_t* on success, 
+ * NULL on error
+ */
+pcap_t *getDeviceHandle(int device_id) {
+    if (device_id < 0 || device_id >= device_counter) {
+        return NULL;
+    }
+
+    return devices[device_id].handle;
+}
