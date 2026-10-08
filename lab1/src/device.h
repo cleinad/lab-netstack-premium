@@ -26,3 +26,12 @@ int findDevice(const char* device);
  * Get the pcap_t object associated with a device ID
  */
 pcap_t *getDeviceHandle(int device_id);
+
+/**
+ * Copy the MAC address associated with a device ID into mac.
+ *
+ * @param device_id ID returned by addDevice().
+ * @param mac Output buffer for the six-byte MAC address.
+ * @return 0 on success, -1 on error.
+ */
+int getDeviceMac(int device_id, unsigned char mac[6]);

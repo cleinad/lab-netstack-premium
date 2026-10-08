@@ -1,5 +1,14 @@
 #include <pcap/pcap.h>
+#include <ifaddrs.h>
+#include <net/if.h>
+#include <sys/socket.h>
 #include <string.h>
+
+#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
+#include <net/if_dl.h>
+#elif defined(__linux__)
+#include <netpacket/packet.h>
+#endif
 
 #define MAX_DEVICES 16
 #define NAME_MAX_SIZE 64
@@ -7,10 +16,54 @@
 typedef struct {
     char name[NAME_MAX_SIZE];
     pcap_t *handle;
+    unsigned char mac[6];
 } Device;
 
 static Device devices[MAX_DEVICES]; // array of Device
 static int device_counter = 0;
+
+static int lookupDeviceMac(const char *device, unsigned char mac[6]) {
+    struct ifaddrs *interfaces = NULL;
+
+    if (getifaddrs(&interfaces) != 0) {
+        return -1;
+    }
+
+    for (struct ifaddrs *interface = interfaces;
+         interface != NULL;
+         interface = interface->ifa_next) {
+        if (interface->ifa_addr == NULL || strcmp(interface->ifa_name, device) != 0) {
+            continue;
+        }
+
+#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
+        if (interface->ifa_addr->sa_family == AF_LINK) {
+            const struct sockaddr_dl *link_address =
+                (const struct sockaddr_dl *)interface->ifa_addr;
+
+            if (link_address->sdl_alen == 6) {
+                memcpy(mac, LLADDR(link_address), 6);
+                freeifaddrs(interfaces);
+                return 0;
+            }
+        }
+#elif defined(__linux__)
+        if (interface->ifa_addr->sa_family == AF_PACKET) {
+            const struct sockaddr_ll *link_address =
+                (const struct sockaddr_ll *)interface->ifa_addr;
+
+            if (link_address->sll_halen == 6) {
+                memcpy(mac, link_address->sll_addr, 6);
+                freeifaddrs(interfaces);
+                return 0;
+            }
+        }
+#endif
+    }
+
+    freeifaddrs(interfaces);
+    return -1;
+}
 
 /**
  * Add a device to the library for sending/receiving packets.
@@ -30,7 +83,11 @@ static int device_counter = 0;
             return -1;
         }
 
-        // process 
+        unsigned char mac[6];
+        if (lookupDeviceMac(device, mac) != 0) {
+            return -1;
+        }
+
         char errbuf[PCAP_ERRBUF_SIZE];
         // pcap_t is context used to capture packets from interface; an opened capture session
         pcap_t* handle = pcap_open_live(
@@ -42,6 +99,7 @@ static int device_counter = 0;
 
         strcpy(devices[device_counter].name, device); // move it directly into the space already allocated
         devices[device_counter].handle = handle;
+        memcpy(devices[device_counter].mac, mac, sizeof(mac));
 
         return device_counter++;
     }
@@ -83,4 +141,13 @@ pcap_t *getDeviceHandle(int device_id) {
     }
 
     return devices[device_id].handle;
+}
+
+int getDeviceMac(int device_id, unsigned char mac[6]) {
+    if (device_id < 0 || device_id >= device_counter || mac == NULL) {
+        return -1;
+    }
+
+    memcpy(mac, devices[device_id].mac, sizeof(devices[device_id].mac));
+    return 0;
 }
