@@ -1,8 +1,16 @@
-# Compiler and Flags
-CC ?= gcc
-CFLAGS ?= -Wall -Wextra -O2
+# Compiler and warning settings used when compiling each source file.
+CC ?= cc
+CPPFLAGS ?= -Isrc
+CFLAGS ?= -Wall -Wextra -Wpedantic -g
 
-TARGET := test_device
+SOURCES := src/device.c src/packetio.c
+OBJECTS := $(SOURCES:.c=.o)
 
-target: tests/test_device.o src/device.o
-	$(CC) $(CFLAGS) -c $< -o $@
+.PHONY: objects
+
+# Compile the link-layer implementation without linking or running a program.
+objects: $(OBJECTS)
+
+# Build the matching object file for any C source file.
+%.o: %.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
