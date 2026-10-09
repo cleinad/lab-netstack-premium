@@ -41,12 +41,16 @@ EtherType if:
  */
 int sendFrame(const void *buf, int len, int ethtype, const void *destmac, int id)
 {
+    if (buf == NULL || len < 0 || destmac == NULL) {
+        return -1;
+    }
+    
     pcap_t* handle = getDeviceHandle(id);
     if (handle == NULL) {
         return -1;
     }
 
-    unsigned char source_mac[6] // allocate space to write source mac address
+    unsigned char source_mac[6]; // allocate space to write source mac address
     if (getDeviceMac(id, source_mac) != 0) {
         return -1;
     }
@@ -67,7 +71,7 @@ int sendFrame(const void *buf, int len, int ethtype, const void *destmac, int id
     memcpy(eth_header->ether_dhost, destmac, 6);
     memcpy(eth_header->ether_shost, source_mac, 6);
     eth_header->ether_type = htons(ethtype); // convert to big endian (network byte order) from machine byte order
-    memcpy(frame + sizeof(struct eth_header), buf, (size_t)len);
+    memcpy(frame + sizeof(struct ether_header), buf, (size_t)len);
 
     int result = pcap_sendpacket(handle, frame, (int)frame_size);
     free(frame);

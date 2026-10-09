@@ -2,6 +2,7 @@
 #define PACKETIO_H
 
 #include <netinet/ether.h>
+#include <net/ethernet.h> // define struct ether_header
 
 /**
  * @file packetio.h
