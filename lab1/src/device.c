@@ -158,3 +158,7 @@ int getDeviceMac(int device_id, unsigned char mac[6]) {
     memcpy(mac, devices[device_id].mac, sizeof(devices[device_id].mac));
     return 0;
 }
+
+int getDeviceCount(void) {
+    return device_counter;
+}

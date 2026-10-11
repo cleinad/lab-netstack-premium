@@ -36,3 +36,5 @@ pcap_t *getDeviceHandle(int device_id);
  * @return 0 on success, -1 on error.
  */
 int getDeviceMac(int device_id, unsigned char mac[6]);
+
+int getDeviceCount(void);
