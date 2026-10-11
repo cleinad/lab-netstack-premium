@@ -1,7 +1,7 @@
 #ifndef PACKETIO_H
 #define PACKETIO_H
 
-#include <netinet/ether.h>
+// #include <netinet/ether.h>
 #include <net/ethernet.h> // define struct ether_header
 
 /**
@@ -25,7 +25,8 @@ int sendFrame(const void *buf, int len, int ethtype, const void *destmac, int id
 typedef int (*frameReceiveCallback)(const void *buf, int len, int id);
 
 /**
- * Register the callback invoked for each received Ethernet II frame.
+ * Register the callback invoked for each received Ethernet II frame and start
+ * capture loops for all registered devices.
  *
  * @param callback Callback function.
  * @return 0 on success, -1 on error.

@@ -37,4 +37,5 @@ pcap_t *getDeviceHandle(int device_id);
  */
 int getDeviceMac(int device_id, unsigned char mac[6]);
 
+/** Return the number of devices currently registered. */
 int getDeviceCount(void);

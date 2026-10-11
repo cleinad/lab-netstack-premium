@@ -105,6 +105,11 @@ int addDevice(const char* device) {
         return -1;
     }
 
+    if (pcap_datalink(handle) != DLT_EN10MB) {
+        pcap_close(handle);
+        return -1;
+    }
+
     strcpy(devices[device_counter].name, device); // move it directly into the space already allocated
     devices[device_counter].handle = handle;
     memcpy(devices[device_counter].mac, mac, sizeof(mac));
