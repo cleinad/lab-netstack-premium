@@ -1,0 +1,29 @@
+Password:
+Detected interfaces:
+- ap1
+- en0
+- awdl0
+- utun0
+- llw0
+- utun1
+- utun2
+- utun3
+- utun4
+- utun5
+- utun1024
+- lo0
+- anpi0
+- anpi3
+- anpi1
+- en4
+- en5
+- en6
+- en1
+- en2
+- en3
+- bridge0
+- gif0
+- stf0
+- nan0
+Added en0 as device ID 0.
+findDevice and duplicate add both returned 0.

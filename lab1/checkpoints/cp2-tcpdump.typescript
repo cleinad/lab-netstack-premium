@@ -1,0 +1,10 @@
+Password:
+tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
+listening on en0, link-type EN10MB (Ethernet), snapshot length 524288 bytes
+15:30:12.616476 96:eb:48:95:4b:7d (oui Unknown) > Broadcast, ethertype Unknown (0x88b5), length 31: 
+	0x0000:  ffff ffff ffff 96eb 4895 4b7d 88b5 7061  ........H.K}..pa
+	0x0010:  636b 6574 696f 2050 5432 2074 6573 74    cketio.PT2.test
+^C
+1 packet captured
+6007 packets received by filter
+0 packets dropped by kernel
