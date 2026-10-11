@@ -1,4 +1,5 @@
-#include <pcap/pcap.h>
+#include "device.h"
+
 #include <ifaddrs.h>
 #include <net/if.h>
 #include <sys/socket.h>
@@ -71,39 +72,45 @@ static int lookupDeviceMac(const char *device, unsigned char mac[6]) {
  * @param device Name of network device to send/receive packet on
  * @return A non-negative _device-ID_ on success, -1 on error.
  */
- int addDevice(const char* device) {
+int addDevice(const char* device) {
     if (device == NULL) {
         return -1;
-    } else if (device_counter >= MAX_DEVICES) {
-        return -1;
-    } else {
-        // process device name
-        size_t len = strlen(device);
-        if (len >= NAME_MAX_SIZE) { // because the null termination takes size
-            return -1;
-        }
-
-        unsigned char mac[6];
-        if (lookupDeviceMac(device, mac) != 0) {
-            return -1;
-        }
-
-        char errbuf[PCAP_ERRBUF_SIZE];
-        // pcap_t is context used to capture packets from interface; an opened capture session
-        pcap_t* handle = pcap_open_live(
-            device, 65535, 1, 1000, errbuf
-        );
-        if (handle == NULL) {
-            return -1;
-        }
-
-        strcpy(devices[device_counter].name, device); // move it directly into the space already allocated
-        devices[device_counter].handle = handle;
-        memcpy(devices[device_counter].mac, mac, sizeof(mac));
-
-        return device_counter++;
     }
- }
+
+    size_t len = strlen(device);
+    if (len >= NAME_MAX_SIZE) { // Null termination requires one byte.
+        return -1;
+    }
+
+    int existing_id = findDevice(device);
+    if (existing_id >= 0) {
+        return existing_id;
+    }
+
+    if (device_counter >= MAX_DEVICES) {
+        return -1;
+    }
+
+    unsigned char mac[6];
+    if (lookupDeviceMac(device, mac) != 0) {
+        return -1;
+    }
+
+    char errbuf[PCAP_ERRBUF_SIZE];
+    // pcap_t is context used to capture packets from interface; an opened capture session
+    pcap_t* handle = pcap_open_live(
+        device, 65535, 1, 1000, errbuf
+    );
+    if (handle == NULL) {
+        return -1;
+    }
+
+    strcpy(devices[device_counter].name, device); // move it directly into the space already allocated
+    devices[device_counter].handle = handle;
+    memcpy(devices[device_counter].mac, mac, sizeof(mac));
+
+    return device_counter++;
+}
 
  /**
   * Find a device added by 'addDevice'.
@@ -116,7 +123,7 @@ int findDevice(const char* device) {
     if (device == NULL) {
         return -1;
     }
-    for (int i = 0; i < MAX_DEVICES; i++) {
+    for (int i = 0; i < device_counter; i++) {
         if (strcmp(devices[i].name, device) == 0) {
             return i;
         }

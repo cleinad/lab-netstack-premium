@@ -9,9 +9,10 @@
  * Add a device to the library for sending/receiving packets.
  *
  * @param device Name of network device to send/receive packet on
- * @return A non-negative _device-ID_ on success, -1 on error.
+ * @return A non-negative _device-ID_ on success, -1 on error. If the device
+ *         was already added, returns its existing device ID.
  */
- int addDevice(const char* device);
+int addDevice(const char* device);
 
  /**
   * Find a device added by 'addDevice'.
