@@ -5,6 +5,17 @@
 
 #define TEST_ETHERTYPE 0x88B5
 
+/* test instructions:
+
+terminal one:
+sudo tcpdump -i en0 -e -XX ether proto 0x88b5
+
+terminal two:
+cd lab1
+sudo ./testpacketio en0
+
+*/
+
 int main(int argc, char *argv[])
 {
     if (argc != 2) {
@@ -34,13 +45,3 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-/* test instructions:
-
-terminal one:
-sudo tcpdump -i en0 -e -XX ether proto 0x88b5
-
-terminal two:
-cd lab1
-sudo ./testpacketio en0
-
-*/
